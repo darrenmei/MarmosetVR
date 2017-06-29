@@ -2,19 +2,23 @@
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using TeamDev.Redis;
 
 public class StartScript : MonoBehaviour {
 
-	public Transform brick;
+	public Transform bar;
 
 	private ArrayList allLocations;
 	private string locationDataFileName = "data.txt";
 	private int num_locations = 0;
+	public RedisDataAccessProvider dataLink;
 
 	void Start() {
 		allLocations = new ArrayList ();
 		loadLocation ();
 		displayObjects ();
+		dataLink = new RedisDataAccessProvider ();
+		dataLink.Connect ();
 	}
 
 	private void loadLocation()
@@ -46,22 +50,24 @@ public class StartScript : MonoBehaviour {
 
 	public struct LocationData
 	{
-		public int x, y, z;
+		public int x, y, z, pitch, yaw;
 		public LocationData(string[] locations) {
 			x = int.Parse(locations[0]);
 			y = int.Parse(locations[1]);
 			z = int.Parse(locations[2]);
+			pitch = int.Parse(locations[3]);
+			yaw = int.Parse(locations[4]);
 		}
 	}
 
 	private void displayObjects() {
 		foreach (LocationData instance in allLocations) {
-			Instantiate(brick, new Vector3(instance.x, instance.y, instance.z), Quaternion.identity);
+			Instantiate(bar, new Vector3(instance.x, instance.y, instance.z), Quaternion.Euler(instance.pitch,0,instance.yaw));
 		}
 	}
 
 	// Update is called once per frame
 	void Update () {
-		
+
 	}
 }
